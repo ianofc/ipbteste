@@ -1,0 +1,97 @@
+bible-api.com
+This service provides a JSON API for retrieving Bible verses and passages, provided by Tim Morgan.
+
+You can get the source code for this app and the open data for its database on GitHub.
+
+There are two ways to use this service, described below.
+
+User Input API
+This is the original API, designed to take what a user types and return the matching verse(s).
+
+https://bible-api.com/BOOK+CHAPTER:VERSE
+Examples
+description	link
+single verse	john 3:16
+abbreviated book name	jn 3:16
+hyphen and comma	matt 25:31-33,46
+Specifying the Translation
+By default, we use the World English Bible (WEB). You can specify a different translation by providing the translation parameter in the URL. For example: /john 3:16?translation=kjv
+
+See list of available translations below.
+
+Single-Chapter Books
+There are some books of the bible that only contain a single chapter, i.e. Obadiah, Philemon, 2 John, 3 John, and Jude. That means it can be ambiguous to request Jude 1. Do you mean the first chapter of Jude, or do you mean the first verse? This API assumes you want the first verse. This seems to be consistent with what most people expect, though it can be inconsistent when compared to other requests:
+
+john 1 (first chapter)
+jude 1 (first verse of only chapter)
+This is working by design. If you want the whole chapter/book of Jude (and all single-chapter books), you can change this behavior by either setting a header or passing an extra URL parameter:
+
+request header: X-Single-Chapter-Book-Matching: indifferent
+URL parameter: single_chapter_book_matching=indifferent (example)
+Parameterized API
+This service provides a more precise identifier-based API as well. It requires that the translation, book, and chapter be specified exactly in the URL.
+
+Usage: /data[/TRANSLATION_ID[/BOOK_ID[/CHAPTER]]]
+
+TRANSLATION_ID
+The translation identifier, such as "web" or "kjv".
+BOOK_ID
+The book id, such as "GEN" or "JHN" (they do not have to be uppercase).
+CHAPTER
+The chapter number.
+If your browser (or an installed browser extension) supports formatting JSON, you can explore the API from /data and click the embedded URLs to navigate down to a chapter.
+
+Some examples:
+
+description	link
+available translations	/data
+books in WEB translation	/data/web
+chapters in John	/data/web/JHN
+verses in John 3	/data/web/JHN/3
+Random Verse
+There is an endpoint for getting a random verse.
+
+Usage: /data/random[/BOOK_IDS]
+
+BOOK_IDS
+a comma-separated list of book IDs (e.g. that which you would get from here, such as "GEN" or "JHN"), or the special strings "OT" or "NT" for all Old Testament or New Testament books, respectively.
+Here are some examples:
+
+description	link
+random verse	/data/web/random
+random verse from specified book	/data/web/random/JHN
+random verse from many books	/data/web/random/MAT,MRK,LUK,JHN
+random verse from Old Testament	/data/web/random/OT
+random verse from New Testament	/data/web/random/NT
+Translations
+Both APIs support these translations:
+
+language	name	identifier
+Cherokee	Cherokee New Testament	cherokee
+Chinese	Chinese Union Version	cuv
+Czech	Bible kralická	bkr
+English	American Standard Version (1901)	asv
+English	Bible in Basic English	bbe
+English	Darby Bible	darby
+English	Douay-Rheims 1899 American Edition	dra
+English	King James Version	kjv
+English	World English Bible	web (default)
+English	Young's Literal Translation (NT only)	ylt
+English (UK)	Open English Bible, Commonwealth Edition	oeb-cw
+English (UK)	World English Bible, British Edition	webbe
+English (US)	Open English Bible, US Edition	oeb-us
+Latin	Clementine Latin Vulgate	clementine
+Portuguese	João Ferreira de Almeida	almeida
+Romanian	Protestant Romanian Corrected Cornilescu Version	rccv
+To get more translations in this list, three things need to happen:
+
+Find a public domain or freely-licensed bible translation. This is probably harder than you think. Freely-licensed means the license says basically you can do what you want with it without restriction. Even if you find a bible that is fully downloadable in XML or whatever format, that doesn't mean its license is permissive. You have to check that it is either so old that is in the public domain, or that the copyright owner has explicitly granted free use.
+Add the XML to the open-bibles repository.
+Add a language file to the bible_ref repository (if the translation is a new language).
+CORS
+We support Cross-Origin Resource Sharing (CORS) so you can use this API via JavaScript in a web browser.
+
+Terms of Use
+This service is free for anyone to use as long as you don't abuse my server. This service is rate limited to 15 requests every 30 seconds (based on IP address), and this may change in the future. Do not use this API to download an entire bible; instead, get the data from the source.
+
+I make no guarantees about this service's availability, quality, or correctness. In fact, this server can and will go down from time to time because it's just a hobby for me. If you need more reliable service, remember you can grab the code and data for this site here and host it yourself!

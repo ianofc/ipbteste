@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Igreja Presbiteriana em Palmeiras, Bahia.">
+    <meta name="keywords" content="igreja presbiteriana, palmeiras, bahia">
+    <meta name="author" content="Ian S. A. Santos">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Igreja Presbiteriana em Palmeiras</title>
+    <meta http-equiv="Cache-Control" content="max-age=31536000"> <!-- Cache para recursos -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .light-theme {
+            background-color: #ffffff;
+            color: #15803d;
+        }
+        .dark-theme {
+            background-color: #1a1a1a;
+            color: #4ade80;
+        }
+        .dark-theme .bg-gray-100 {
+            background-color: #111827;
+        }
+        .dark-theme .bg-white {
+            background-color: #1f2937;
+        }
+        .dark-theme .text-gray-700 {
+            color: #9ca3af;
+        }
+        .green-theme {
+            background-color: #14532d;
+            color: #ffffff;
+        }
+        .green-theme .bg-gray-100 {
+            background-color: #064e3b;
+        }
+        .green-theme .bg-white {
+            background-color: #065f46;
+        }
+        .green-theme .text-gray-700 {
+            color: #a7f3d0;
+        }
+        .dark-theme header, .green-theme header {
+            background-color: #2d2d2d;
+        }
+    </style>
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const themeLabel = document.getElementById('themeLabel');
+            if (body.classList.contains('light-theme')) {
+                body.classList.remove('light-theme');
+                body.classList.add('dark-theme');
+                themeLabel.textContent = 'Dark';
+            } else if (body.classList.contains('dark-theme')) {
+                body.classList.remove('dark-theme');
+                body.classList.add('green-theme');
+                themeLabel.textContent = 'Green';
+            } else {
+                body.classList.remove('green-theme');
+                body.classList.add('light-theme');
+                themeLabel.textContent = 'Light';
+            }
+        }
+    </script>
+</head>
+
+<body id="body" class="light-theme">
+    <header class="bg-cinza-escuro p-4 fixed top-0 w-full z-50" id="header">
+        <div class="container mx-auto flex justify-between items-center">
+            <img alt="Logo da Igreja Presbiteriana em Palmeiras" class="h-10" loading="lazy" src="src/imgs/acs/logo_ipp.png" />
+            <nav>
+                <ul class="flex space-x-4" id="main-nav">
+                    <li><a class="hover:text-green-500" href="#body" data-translate="Home"><span>Home</span><img src="src/imgs/icons/home.png" class="hidden h-6" alt="Home"></a></li>
+                    <li><a class="hover:text-green-500" href="#mensagem-pastor" data-translate="Editorial"><span>Editorial</span><img src="src/imgs/icons/book.png" class="hidden h-6" alt="Editorial"></a></li>
+                    <li><a class="hover:text-green-500" href="#organization-slider" data-translate="Organizações"><span>Organizações</span><img src="src/imgs/icons/organ.png" class="hidden h-6" alt="Organizações"></a></li>
+                    <li><a class="hover:text-green-500" href="#documents-container" data-translate="Download"><span>Download</span><img src="src/imgs/icons/down.png" class="hidden h-6" alt="Download"></a></li>
+                    <li><a class="hover:text-green-500" href="#sobre" data-translate="Sobre"><span>Sobre</span><img src="src/imgs/icons/about.png" class="hidden h-6" alt="Sobre"></a></li>
+                    <li><a class="hover:text-green-500" href="#conversa-pastor" data-translate="Contato"><span>Contato</span><img src="src/imgs/icons/contat.png" class="hidden h-6" alt="Contato"></a></li>
+                </ul>
+            </nav>
+            <div class="flex items-center">
+                <img id="themeButton" loading="lazy" src="src/imgs/acs/paint.png" alt="Mudar Tema" class="h-5 cursor-pointer" onclick="toggleTheme()" />
+                    <span class="ml-2 text-sm" id="themeLabel">Light</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="h-screen flex items-center justify-center bg-cover bg-center"
+        style="background-image: url('src/imgs/acs/banner_ipp.png');">
+        <div class="text-center text-white">
+            <h1 class="text-4xl md:text-6xl font-bold" data-translate="Bem-vindo à IPP">Bem-vindo à IPP</h1>
+            <p class="mt-4 text-lg md:text-2xl" data-translate="Uma comunidade de fé e amor em Palmeiras-BA">Uma comunidade de fé e amor em Palmeiras-BA</p>
+        </div>
+    </section>
+
+    <!-- Flags -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+
+                <div class="container mx-auto px-6 flex justify-center space-x-4">
+                    <img alt="Brasil" class="flag w-8 h-6 cursor-pointer hover:scale-110 transition-transform" onclick="translateToPortugues()" src="src/imgs/flags/brasil.png">
+                    <img alt="USA" class="flag w-8 h-6 cursor-pointer hover:scale-110 transition-transform" onclick="translateToEnglish()" src="src/imgs/flags/usa.png">
+                    <img alt="España" class="flag w-8 h-6 cursor-pointer hover:scale-110 transition-transform" onclick="translateToSpanish()" src="src/imgs/flags/espanha.png">
+                    <img alt="France" class="flag w-8 h-6 cursor-pointer hover:scale-110 transition-transform" onclick="translateToFrench()" src="src/imgs/flags/franca.png">
+                    <img alt="Deutschland" class="flag w-8 h-6 cursor-pointer hover:scale-110 transition-transform" onclick="translateToGerman()" src="src/imgs/flags/alemanha.png">
+                    <img alt="中国" class="flag w-8 h-6 cursor-pointer hover:scale-110 transition-transform" onclick="translateToMandarin()" src="src/imgs/flags/china.png">
+                    <img alt="日本" class="flag w-8 h-6 cursor-pointer hover:scale-110 transition-transform" onclick="translateToJapanese()" src="src/imgs/flags/japao.png">
+                </div> </div>
+</section>
+
+    <!-- Versículo do Dia Section -->
+    <section class="py-12 bg-gray-100">
+            </div>
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Versículo para Meditar">Versículo para Meditar</h2>
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center max-w-2xl mx-auto">
+
+
+                <div id="verse" class="text-lg text-gray-700 mb-4">
+                    Carregando versículo...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Música Section -->
+    <section class="py-12">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Música">Música</h2>
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Player principal -->
+                <div class="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-lg">
+                    <div id="current-track" class="text-center">
+                        <h3 id="current-title" class="text-xl font-bold mb-4" data-translate="Selecione uma Música">Selecione uma Música</h3>
+                        <iframe id="youtube-player" class="w-full aspect-video mb-4" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        <div class="flex justify-center gap-4 mt-4">
+                                <button id="prev-track" class="bg-green-700 text-white px-4 py-2 rounded">
+                                    <i class="fas fa-step-backward"></i>
+                                </button>
+                                <button id="next-track" class="bg-green-700 text-white px-4 py-2 rounded">
+                                    <i class="fas fa-step-forward"></i>
+                                </button>
+                            </div>
+                    </div>
+                </div>
+                <!-- Lista de músicas -->
+                <div class="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-bold mb-4" data-translate="Playlist">Playlist</h3>
+                    <div id="playlist" class="space-y-2 max-h-[500px] overflow-y-auto">
+                        <!-- Tracks will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Home Section -->
+    <section class="py-12 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Nossa Igreja">Nossa Igreja</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4" data-translate="Nossa Sede">Nossa Sede</h3>
+                    <img id="location-photo" loading="lazy" src="" alt="Foto da localização" class="w-full h-64 object-cover rounded-lg">
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4" data-translate="Localização">Localização</h3>
+                    <div id="map" class="w-full h-64 rounded-lg mb-4"></div>
+                    <p class="text-center text-gray-700" data-translate="Igreja Presbiteriana em Palmeiras - Rua Coronel Antônio Afonso, 38, Palmeiras-Ba">Igreja Presbiteriana em Palmeiras - Rua Coronel Antônio Afonso, 38, Palmeiras-Ba</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   <!-- Editorial Section -->
+    <section id="mensagem-pastor" class="py-12">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-10" data-translate="Editorial">Editorial</h2>
+            <div class="text-center">
+                <p class="text-lg text-justify" data-translate="Bem-vindos à nossa igreja! Estamos aqui para compartilhar a palavra de Deus e viver em comunidade. Junte-se a nós em nossos cultos e atividades.">Bem-vindos à nossa igreja! Estamos aqui para compartilhar a palavra de Deus e viver em comunidade. Junte-se a nós em nossos cultos e atividades.</p>
+
+                <h3 class="text-2xl font-bold mt-8" data-translate="Mensagem do Pastor">Mensagem do Pastor</h3>
+
+                <p class="text-lg text-justify">Eu tinha 34 anos quando usei a palavra “crônica” na frente da palavra “dor” pela primeira vez. Eu disse isso em voz baixa, me perguntando se cinco anos de sofrimento eram tempo suficiente para merecer a frase. Quando essa porta de sofrimento se abriu diante de mim, eu não entendi que o caminho para crescer na fé poderia doer tanto.</p>
+
+
+                <p class="text-lg text-justify">Na primeira carta do apóstolo Pedro, ele encoraja os crentes a perseverarem no sofrimento por seu efeito refinador da fé. Ele nos aponta para o peso da glória eterna que está por vir, tornando nossos sofrimentos menores do que parecem à primeira vista. Ele nos dá confiança para nos confiarmos a um Pai amoroso.</p>
+
+                <p class="text-lg text-justify">Pedro me faz contorcer, no entanto, quando leio que há lições que o cristão deve aprender no fogo refinador do sofrimento. “Vocês se alegram nisso, embora agora, por um curto período de tempo, tenham lutado em várias provações, para que a genuinidade da sua fé — mais valiosa do que o ouro que perece, embora refinado pelo fogo — possa resultar em louvor, glória e honra, na revelação de Jesus Cristo” (1 Pe 1:6–7 HCSB, ênfase adicionada).</p>
+
+                <p class="text-lg text-justify">Quando o próximo passo da santificação nos coloca diretamente na frente da porta do sofrimento — seja ele rotulado como "câncer de mama" ou "doença de Lyme", podemos responder de duas maneiras. Podemos desperdiçar a oportunidade de crescer em piedade nos tornando amargos, ou podemos cruzar o limiar confiantes de que o que recebemos da mão de Deus é para sua glória e nosso bem.</p>
+
+                <p class="text-lg text-justify">Glenna Marshall é esposa de pastor e mãe de dois filhos. Ela é autora de <em>The Promise Is His Presence</em>, <em>Everyday Faithfulness</em> e <em>Memorizing Scripture</em>. Ela escreve regularmente sobre alfabetização bíblica, sofrimento e a fidelidade de Deus em seu site. Ela é membro da Grace Bible Fellowship em Sikeston, Missouri.</p>
+
+
+    <h3 class="text-2xl font-bold mt-6" data-translate="Quando Deus te chama para atravessar a porta do sofrimento">Quando Deus te chama para atravessar a porta do sofrimento</h3>
+
+                <p class="text-lg text-justify">Se o sofrimento é a porta pela qual você deve passar, então anime-se nas maneiras pelas quais Deus o usará para o bem em sua vida.</p>
+
+                <h3 class="text-2xl font-bold mt-6" data-translate="Fé Aumentada">Fé Aumentada</h3>
+
+                <p class="text-lg text-justify">Aprendemos a verdadeira natureza da nossa fé quando ela é preparada contra a dor, a tristeza ou a perseguição. Quando nossos corações estão sobrecarregados com a tristeza, ou quando nossos corpos são devastados pela doença, Deus pode garantir nossa confiança.</p>
+
+                <p class="text-lg text-justify">Eu costumava temer que minha fé na bondade de Deus não fosse forte o suficiente para suportar anos de dor física, mas o sofrimento crônico queimou qualquer ilusão de que a salvação depende de mim. Nós perseveramos, e é Deus quem nos preserva. Nos piores momentos de dor, minha fé na bondade de Deus parecia tão frágil. Eu não conseguia pensar em fé de longo prazo, apenas no próximo passo à minha frente.</p>
+
+                <p class="text-lg text-justify">Mas Deus usou os momentos de perseverança de respiração a respiração para me ensinar que era seguro confiar nele para o próximo passo. Ele pode não ter removido meu sofrimento quando eu queria, mas ele estava comigo no meio dele. Meu sofrimento revelou que foi Deus quem me guardou, protegendo meu coração pela eternidade (1 Pe 1:5–7).</p>
+
+                <h3 class="text-2xl font-bold mt-6" data-translate="Apresentando Cristo">Apresentando Cristo</h3>
+
+                pecados para que pudéssemos desfrutar do peso ilimitado, eterno e imperecível da glória que vem depois de termos sofrido um pouco. Ele certamente nos guardará até que aquele Dia apareça (1 Pe 1:5).</p>
+
+                <p class="text-lg text-justify">Porque ele nos deu todas as bênçãos espirituais em Cristo, podemos trilhar o caminho do sofrimento sabendo que Cristo o percorreu primeiro e nos mostra como prosseguir (1 Pedro 2:21).</p>
+
+                <p class="text-lg text-justify">Embora meus anos com dor crônica tenham sido os mais difíceis da minha vida, a obra fiel de Deus produziu o fruto da perseverança que me preparou para a próxima provação. Eu finalmente pude caminhar pela porta ao lado do sofrimento com a confiança de que a estrada além estava pavimentada com o cuidado de Deus. Se Deus ordenou uma porta de sofrimento para você atravessar, você pode confiar que ele investiu tanto na sua perseverança quanto na sua restauração (1 Pe 5:10). Você pode atravessar o limiar doloroso sabendo que a estrada além é incomparavelmente curta em vista da herança que foi comprada e guardada para você.</p>
+
+                <p class="text-lg text-justify">Um pé na frente do outro, Christian. Você não sofre sem propósito, e você não sofre sozinho.</p>
+
+                <h3 class="text-2xl font-bold mt-6" data-translate="Pedidos de Oração">Pedidos de Oração</h3>
+                <p class="text-lg text-justify" data-translate="“Confessai, pois, os vossos pecados uns aos outros e orai uns pelos outros, para serdes curados. Muito pode, por sua eficácia, a súplica do justo” Tiago 5.16.">“Confessai, pois, os vossos pecados uns aos outros e orai uns pelos outros, para serdes curados. Muito pode, por sua eficácia, a súplica do justo” Tiago 5.16.</p>
+
+                <h4 class="text-xl font-bold mt-4" data-translate="Saúde emocional">Saúde emocional</h4>
+                <p class="text-lg text-center">Eva, Marilene, Luciene e Ana Paula.</p>
+
+                <h4 class="text-xl font-bold mt-4" data-translate="Enlutados">Enlutados</h4>
+                <p class="text-lg text-center">Família de Carmelina e Família de Erito.</p>
+
+                <h4 class="text-xl font-bold mt-4" data-translate="Enfermidades">Enfermidades</h4>
+                <p class="text-lg text-center">Abel, Armando, Geane, Enzo e Luma.</p>
+
+                <h4 class="text-xl font-bold mt-4" data-translate="Recuperação">Recuperação</h4>
+                <p class="text-lg text-center">Dagmar, Nemésio, Leide e João.</p>
+
+            <h4 class="text-xl font-bold mt-4" data-translate="Outros Pedidos">Outros Pedidos</h4>
+                <p class="text-lg text-center">Despertamento da Igreja, Grávidas, Amanda.</p>
+            </div>
+        </div>
+    </section>
+    <!-- Cultos Section -->
+    <section class="py-12 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Nossos Cultos">Nossos Cultos</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <img loading="lazy" src="src/imgs/cult/Culto1.png"
+                        alt="Imagem de um culto na congregação Vila Jason Alves" class="w-full h-48 object-cover"
+                        width="400" height="300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2" data-translate="Terça-feira">Terça-feira</h3>
+                        <p class="text-gray-700" data-translate="Congregação Vila Jason Alves às 19:30">Congregação Vila Jason Alves às 19:30</p>
+                    </div>
+                </div>
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <img loading="lazy" src="src/imgs/cult/Cutlo2.png"
+                        alt="Imagem de um culto de oração" class="w-full h-48 object-cover" width="400" height="300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2" data-translate="Quarta-feira">Quarta-feira</h3>
+                        <p class="text-gray-700" data-translate="Culto de Oração às 19:30">Culto de Oração às 19:30</p>
+                    </div>   
+                   </div>
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <img loading="lazy" src="src/imgs/cult/Culto3.png"
+                        alt="Imagem de um culto de doutrina" class="w-full h-48 object-cover" width="400" height="300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2" data-translate="Sexta-feira">Sexta-feira</h3>
+                        <p class="text-gray-700" data-translate="Culto de Doutrina às 19:30">Culto de Doutrina às 19:30</p>
+                    </div>
+                </div>
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <img loading="lazy" src="src/imgs/cult/Culto4.png"
+                        alt="Imagem de uma escola dominical" class="w-full h-48 object-cover" width="400" height="300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2" data-translate="Domingo">Domingo</h3>
+                        <p class="text-gray-700" data-translate="Escola Dominical às 10:00 e Culto Solene às 19:00">Escola Dominical às 10:00 e Culto Solene às 19:00</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <!-- Eventos Section -->
+                        <section class="py-12 bg-gray-100">
+                            <div class="container mx-auto px-6">
+                                <h2 class="text-3xl font-bold text-center mb-8" data-translate="Eventos">Eventos</h2>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div class="bg-white p-4 rounded-lg shadow-lg text-center">
+                                        <img loading="lazy" src="src/imgs/evnts/Evento1.png" alt="Dia das Mães" class="w-24 h-24 rounded-full mx-auto mb-2">
+                                        <p data-translate="Dia das Mães<br>2º Domingo de Maio">Dia das Mães<br>2º Domingo de Maio</p>
+                                    </div>
+                                    <div class="bg-white p-4 rounded-lg shadow-lg text-center">
+                                        <img loading="lazy" src="src/imgs/evnts/Evento2.png" alt="Dia do Jovem Presbiteriano" class="w-24 h-24 rounded-full mx-auto mb-2">
+                                        <p data-translate="Dia do Jovem Presbiteriano<br>3º Domingo de Maio">Dia do Jovem Presbiteriano<br>3º Domingo de Maio</p>
+                                    </div>
+                                    <div class="bg-white p-4 rounded-lg shadow-lg text-center">
+                                        <img loading="lazy" src="src/imgs/evnts/Evento3.png" alt="Dia da Escola Dominical" class="w-24 h-24 rounded-full mx-auto mb-2">
+                                        <p data-translate="Dia da Escola Dominical<br>3º Domingo de Setembro">Dia da Escola Dominical<br>3º Domingo de Setembro</p>
+                                    </div>
+                                    <div class="bg-white p-4 rounded-lg shadow-lg text-center">
+                                        <img loading="lazy" src="src/imgs/evnts/Evento4.png" alt="Dia das Crianças" class="w-24 h-24 rounded-full mx-auto mb-2">
+                                        <p data-translate="Dia das Crianças<br>12 de Outubro">Dia das Crianças<br>12 de Outubro</p>
+                                    </div>
+                                    <!-- Adicione mais eventos conforme necessário -->
+                                </div>
+                                <div class="bg-white p-6 rounded-lg shadow-lg mt-4">
+                                    <iframe id="google-calendar" class="w-full h-[600px]" frameborder="0" scrolling="no"></iframe>
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <!-- Organizações Section -->
+                                    <section class="py-12 bg-gray-100">
+                                        <div class="flex flex-col items-center">
+                                            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Nossas Organizações">Nossas Organizações</h2>
+            <div class="relative flex items-center justify-center">
+                <button id="prev" class="absolute left-0 text-green-700 hover:text-green-500 focus:outline-none">
+                    <i class="fas fa-chevron-left fa-2x"></i>
+                </button>
+                <div id="organization-slider" class="w-full overflow-hidden">
+                    <div class="flex transition-transform duration-500 ease-in-out" id="slider">
+                        <div class="flex flex-col items-center justify-center w-full text-center">
+                            <img loading="lazy" src="src/imgs/orgs/logo_ucp.png"
+                                alt="Imagem de uma reunião da UCP – União de Crianças Presbiterianas"
+                                class="w-32 h-32 object-contain" width="400" height="300">
+                            <div class="w-full md:w-1/2 md:pl-8 mt-6 md:mt-0"> 
+
+               <h3 class="text-xl font-bold mb-2" data-translate="UCP – União de Crianças Presbiterianas">UCP – União de Crianças Presbiterianas</h3>
+                                <p class="text-gray-700" data-translate="A UCP é dedicada ao ensino e crescimento espiritual das crianças, proporcionando atividades educativas e recreativas.">A UCP é dedicada ao ensino e crescimento espiritual das crianças, proporcionando atividades educativas e recreativas.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center justify-center w-full text-center hidden">
+                            <img loading="lazy" src="src/imgs/orgs/logo_upa.png"
+                                alt="Imagem de uma reunião da UPA – União de Adolescentes Presbiterianos"
+                                class="w-32 h-32 object-contain" width="400" height="300">
+                            <div class="w-full md:w-1/2 mt-6">
+                                <h3 class="text-xl font-bold mb-2" data-translate="UPA – União de Adolescentes Presbiterianos">UPA – União de Adolescentes Presbiterianos</h3>
+                                <p class="text-gray-700" data-translate="A UPA oferece um espaço para os adolescentes se conectarem, aprenderem sobre a fé e participarem de atividades sociais.">A UPA oferece um espaço para os adolescentes se conectarem,
+                                    aprenderem sobre a fé e participarem de atividades sociais.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center justify-center w-full text-center hidden">
+                            <img loading="lazy" src="src/imgs/orgs/logo_ump.png"
+                                alt="Imagem de uma reunião da UMP – União de Mocidade Presbiteriana"
+                                class="w-32 h-32 object-contain" width="400" height="300">
+                            <div class="w-full md:w-1/2 mt-6">
+                                <h3 class="text-xl font-bold mb-2" data-translate="UMP – União de Mocidade Presbiteriana">UMP – União de Mocidade Presbiteriana</h3>
+                                <p class="text-gray-700" data-translate="A UMP é voltada para os jovens adultos, promovendo encontros, estudos bíblicos e eventos sociais.">A UMP é voltada para os jovens adultos, promovendo encontros,
+                                    estudos bíblicos e eventos sociais.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center justify-center w-full text-center hidden">
+                            <img loading="lazy" src="src/imgs/orgs/logo_uph.png"
+                                alt="Imagem de uma reunião da UPH – União Presbiteriana de Homens"
+                                class="w-32 h-32 object-contain" width="400" height="300">
+                            <div class="w-full md:w-1/2 mt-6">
+                                <h3 class="text-xl font-bold mb-2" data-translate="UPH – União Presbiteriana de Homens">UPH – União Presbiteriana de Homens</h3>
+                                <p class="text-gray-700" data-translate="A UPH reúne os homens da igreja para estudos, orações e atividades de serviço comunitário.">A UPH reúne os homens da igreja para estudos, orações e
+                                    atividades de serviço comunitário.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center justify-center w-full text-center hidden">
+                            <img loading="lazy" src="src/imgs/orgs/logo_saf.png"
+                                alt="Imagem de uma reunião da SAF – Sociedade Auxiliadora Feminina"
+                                class="w-32 h-32 object-contain" width="400" height="300">
+                            <div class="w-full md:w-1/2 mt-6">
+                                <h3 class="text-xl font-bold mb-2" data-translate="SAF – Sociedade Auxiliadora Feminina">SAF – Sociedade Auxiliadora Feminina</h3>
+                                <p class="text-gray-700" data-translate="A SAF é dedicada às mulheres da igreja, oferecendo suporte, estudos bíblicos e atividades de caridade.">A SAF é dedicada às mulheres da igreja, oferecendo suporte,
+                                    estudos bíblicos e atividades de caridade.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="next" class="absolute right-0 text-green-700 hover:text-green-500 focus:outline-none">
+                    <i class="fas fa-chevron-right fa-2x"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Downloads Section -->
+    <section class="py-12">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Downloads">Downloads</h2>
+            <div id="documents-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Documents will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+                    <!-- Bíblia Section -->
+    <section class="py-12 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Bíblia Sagrada">Bíblia Sagrada</h2>
+            <div class="max-w-2xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-4 mb-6">
+                    <select id="book-select" class="flex-1 p-2 border rounded-lg">
+                        <option value="">Selecione um livro</option>
+                    </select>
+                    <select id="chapter-select" class="flex-1 p-2 border rounded-lg">
+                        <option value="">Selecione um capítulo</option>
+                    </select>
+                </div>
+                <div id="bible-content" class="bg-white p-6 rounded-lg shadow-lg">
+                    <p class="text-center text-gray-600" data-translate="Selecione um livro e capítulo para ler">Selecione um livro e capítulo para ler</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre Section -->
+    <section id="sobre" class="py-12">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="A História da Igreja Presbiteriana em Palmeiras, Bahia">A História da Igreja Presbiteriana em Palmeiras, Bahia</h2>
+
+            <h3 class="text-2xl font-bold mt-6" data-translate="Introdução">Introdução</h3>
+            <p class="text-lg text-justify" data-translate="A história da Igreja Presbiteriana em Palmeiras, Bahia, é um relato de fé, resistência e transformação. Desde a chegada dos missionários norte-americanos no século XIX até a consolidação da igreja na região, essa narrativa reflete os desafios enfrentados por aqueles que buscavam introduzir uma nova visão religiosa em um contexto profundamente católico. Este livro busca explorar essa trajetória, destacando figuras centrais como Ashbel Green Simonton, George W. Chamberlain, William Alfred Waddell e João Capistrano de Souza, além de contextualizar a resistência local e a evolução da igreja em Palmeiras.">A história da Igreja Presbiteriana em Palmeiras, Bahia, é um relato de fé, resistência e transformação. Desde a chegada dos missionários norte-americanos no século XIX até a consolidação da igreja na região, essa narrativa reflete os desafios enfrentados por aqueles que buscavam introduzir uma nova visão religiosa em um contexto profundamente católico. Este livro busca explorar essa trajetória, destacando figuras centrais como Ashbel Green Simonton, George W. Chamberlain, William Alfred Waddell e João Capistrano de Souza, além de contextualizar a resistência local e a evolução da igreja em Palmeiras.</p>
+
+            <h3 class="text-2xl font-bold mt-6" data-translate="Capítulo I – A Chegada do Presbiterianismo ao Brasil">Capítulo I – A Chegada do Presbiterianismo ao Brasil</h3>
+            <p class="text-lg text-justify" data-translate="A história do presbiterianismo no Brasil começa no século XIX, em um contexto de profundas transformações sociais e religiosas. O país, predominantemente católico, estava prestes a receber uma nova corrente de fé que buscava não apenas a evangelização, mas também a promoção de um modelo de civilização e modernização. Essa chegada foi marcada pela alinhada com a ideia de modernização que permeava o pensamento ocidental da época, onde a educação e a ciência eram vistas como ferramentas essenciais para o progresso.">A história do presbiterianismo no Brasil começa no século XIX, em um contexto de profundas transformações sociais e religiosas. O país, predominantemente católico, estava prestes a receber uma nova corrente de fé que buscava não apenas a evangelização, mas também a promoção de um modelo de civilização e modernização. Essa chegada foi marcada pela alinhada com a ideia de modernização que permeava o pensamento ocidental da época, onde a educação e a ciência eram vistas como ferramentas essenciais para o progresso.</p>
+
+            <p class="text-lg text-justify" data-translate="A Missão Central do Brasil, organizada sob diretrizes oriundas de Nova Iorque, buscava criar instituições que não apenas evangelizassem, mas também promovam a educação e a saúde. Essa abordagem holística visava não apenas salvar almas, mas também melhorar as condições de vida das pessoas, especialmente nas áreas mais remotas e carentes do país.">A Missão Central do Brasil, organizada sob diretrizes oriundas de Nova Iorque, buscava criar instituições que não apenas evangelizassem, mas também promovam a educação e a saúde. Essa abordagem holística visava não apenas salvar almas, mas também melhorar as condições de vida das pessoas, especialmente nas áreas mais remotas e carentes do país.</p>
+
+            <h3 class="text-2xl font-bold mt-6" data-translate="Capítulo II – A Resistência em Palmeiras">Capítulo II – A Resistência em Palmeiras</h3>
+            <p class="text-lg text-justify" data-translate="A introdução do presbiterianismo em Palmeiras, então conhecida como Villa Bella das Palmeiras, encontrou forte resistência. A comunidade local, enraizada em tradições católicas, desconfiava das novas correntes religiosas. Os proprietários de terras se recusavam a vender propriedades para a construção de templos e escolas, considerando o protestantismo uma ameaça à ordem social estabelecida. Essa resistência foi um dos principais obstáculos enfrentados pelos missionários, que buscavam estabelecer uma base sólida para suas atividades.">A introdução do presbiterianismo em Palmeiras, então conhecida como Villa Bella das Palmeiras, encontrou forte resistência. A comunidade local, enraizada em tradições católicas, desconfiava das novas correntes religiosas. Os proprietários de terras se recusavam a vender propriedades para a construção de templos e escolas, considerando o protestantismo uma ameaça à ordem social estabelecida. Essa resistência foi um dos principais obstáculos enfrentados pelos missionários, que buscavam estabelecer uma base sólida para suas atividades.</p>
+
+            <h3 class="text-2xl font-bold mt-6" data-translate="Capítulo III – O Papel de George W. Chamberlain">Capítulo III – O Papel de George W. Chamberlain</h3>
+            <p class="text-lg text-justify" data-translate="Em 19 de novembro de 1901, o Rev. George W. Chamberlain conduziu a primeira profissão de fé em Palmeiras, reunindo mais de mil fiéis. Sua atuação foi fundamental para estabelecer os primeiros vínculos da missão na região, abrindo espaço para que o presbiterianismo começasse a se enraizar, mesmo diante da hostilidade inicial. Chamberlain, que chegou ao Brasil em 1862, se destacou como um evangelizador visionário, deixando um legado duradouro na história do protestantismo na região.">Em 19 de novembro de 1901, o Rev. George W. Chamberlain conduziu a primeira profissão de fé em Palmeiras, reunindo mais de mil fiéis. Sua atuação foi fundamental para estabelecer os primeiros vínculos da missão na região, abrindo espaço para que o presbiterianismo começasse a se enraizar, mesmo diante da hostilidade inicial. Chamberlain, que chegou ao Brasil em 1862, se destacou como um evangelizador visionário, deixando um legado duradouro na história do protestantismo na região.</p>
+
+            <h3 class="text-2xl font-bold mt-6" data-translate="Capítulo IV – William Alfred Waddell e a Busca por um Novo Lar">Capítulo IV – William Alfred Waddell e a Busca por um Novo Lar</h3>
+
+            <p class="text-lg text-justify" data-translate="O Rev. William Alfred Waddell, que chegou ao Brasil em 1890, também desempenhou um papel crucial na expansão do presbiterianismo em Palmeiras. Em suas visitas, ele reconheceu o potencial da região, mas enfrentou as mesmas barreiras que Chamberlain. As tentativas de estabelecer uma escola central em locais como Itaberaba, Lençóis e Palmeiras foram frustradas pela forte presença católica. Diante dessa resistência, Waddell decidiu buscar um novo local para fundaro Instituto Ponte Nova, escolhendo a Fazenda Ponte Nova, na Chapada Diamantina, como o espaço ideal para desenvolver suas obras missionárias.">O Rev. William Alfred Waddell, que chegou ao Brasil em 1890, também desempenhou um papel crucial na expansão do presbiterianismo em Palmeiras. Em suas visitas, ele reconheceu o potencial da região, mas enfrentou as mesmas barreiras que Chamberlain. As tentativas de estabelecer uma escola central em locais como Itaberaba, Lençóis e Palmeiras foram frustradas pela forte presença católica. Diante dessa resistência, Waddell decidiu buscar um novo local para fundaro Instituto Ponte Nova, escolhendo a Fazenda Ponte Nova, na Chapada Diamantina, como o espaço ideal para desenvolver suas obras missionárias.</p>
+
+            <h3 class="text-2xl font-bold mt-6" data-translate="Capítulo V – João Capistrano de Souza: O Pregador e Líder Espiritual">Capítulo V – João Capistrano de Souza: O Pregador e Líder Espiritual</h3>
+            <p class="text-lg text-justify" data-translate="João Capistrano Nonato de Souza é uma figura central na história da Igreja Presbiteriana em Palmeiras, Bahia. Sua trajetória é marcada por um profundo compromisso com a fé reformada e uma dedicação incansável à evangelização em uma região que, à época, era predominantemente católica e resistente a novas correntes religiosas. Este capítulo explora a vida e a obra de Capistrano, destacando seu papel como pregador, líder comunitário e a influência que exerceu na formação da identidade presbiteriana na região.">João Capistrano Nonato de Souza é uma figura central na história da Igreja Presbiteriana em Palmeiras, Bahia. Sua trajetória é marcada por um profundo compromisso com a fé reformada e uma dedicação incansável à evangelização em uma região que, à época, era predominantemente católica e resistente a novas correntes religiosas. Este capítulo explora a vida e a obra de Capistrano, destacando seu papel como pregador, líder comunitário e a influência que exerceu na formação da identidade presbiteriana na região.</p>
+
+            <h4 class="text-xl font-bold mt-4" data-translate="A Chegada de João Capistrano de Souza">A Chegada de João Capistrano de Souza</h4>
+            <p class="text-lg text-justify" data-translate="Nascido em um contexto de forte tradição católica, Capistrano foi um autodidata que se destacou por sua busca incessante por conhecimento e pela verdade espiritual. Sua conversão aoprotestantismo foi um marco em sua foi ummarco em sua vida, levando-o a se tornar um dos primeiros pastores nacionais ordenados na Bahia. A sua ordenação, ocorrida em 1912, não apenas simbolizou sua dedicação à fé, mas também representou um passo significativo na formação de líderes locais que poderiam conduzir a missão presbiteriana em um ambiente desafiador.">Nascido em um contexto de forte tradição católica, Capistrano foi um autodidata que se destacou por sua busca incessante por conhecimento e pela verdade espiritual. Sua conversão aoprotestantismo foi um marco em sua foi ummarco em sua vida, levando-o a se tornar um dos primeiros pastores nacionais ordenados na Bahia. A sua ordenação, ocorrida em 1912, não apenas simbolizou sua dedicação à fé, mas também representou um passo significativo na formação de líderes locais que poderiam conduzir a missão presbiteriana em um ambiente desafiador.</p>
+
+            <h4 class="text-xl font-bold mt-4" data-translate="O Pregador Dedicado">O Pregador Dedicado</h4>
+            <p class="text-lg text-justify" data-translate="Capistrano não se limitou a ser um líder religioso; ele se tornou um verdadeiro pregador, cuja eloquência e paixão pela mensagem do evangelho conquistaram muitos corações.Sua abordagem pastoral era caracterizada por uma profunda empatia e um desejo genuíno de entender as necessidades da comunidade. Ele não apenas pregava a palavra de Deusmas também se envolvia ativamente nas questões sociais e culturais que afetavam seus paroquianos.">Capistrano não se limitou a ser um líder religioso; ele se tornou um verdadeiro pregador, cuja eloquência e paixão pela mensagem do evangelho conquistaram muitos corações.Sua abordagem pastoral era caracterizada por uma profunda empatia e um desejo genuíno de entender as necessidades da comunidade. Ele não apenas pregava a palavra de Deusmas também se envolvia ativamente nas questões sociais e culturais que afetavam seus paroquianos.</p>
+
+            <p class="text-lg text-justify" data-translate="Em um ambiente onde o catolicismo era a norma, Capistrano enfrentou desafios significativos. A resistência da comunidade local à nova fé era palpável, e muitos viam o protestantismo como uma ameaça à ordem estabelecida. No entanto, sua habilidade em comunicar a mensagem cristã de forma acessível e relevante permitiu que ele construísse pontes com aqueles que inicialmente eram céticos.">Em um ambiente onde o catolicismo era a norma, Capistrano enfrentou desafios significativos. A resistência da comunidade local à nova fé era palpável, e muitos viam o protestantismo como uma ameaça à ordem estabelecida. No entanto, sua habilidade em comunicar a mensagem cristã de forma acessível e relevante permitiu que ele construísse pontes com aqueles que inicialmente eram céticos.</p>
+
+            <h4 class="text-xl font-bold mt-4" data-translate="A Influência na Comunidade">A Influência na Comunidade</h4>
+            <p class="text-lg text-justify" data-translate="Além de seu papel como pregador, Capistrano também se destacou como uma figura comunitária. Ele se envolveu em questões políticas e sociais, buscando defender os interesses de sua comunidade em um contexto onde as vozes dos protestantes eram frequentemente marginalizadas. Sua atuação política, embora significativa, não deve ofuscar sua verdadeira vocação: a pregação do evangelho.">Além de seu papel como pregador, Capistrano também se destacou como uma figura comunitária. Ele se envolveu em questões políticas e sociais, buscando defender os interesses de sua comunidade em um contexto onde as vozes dos protestantes eram frequentemente marginalizadas. Sua atuação política, embora significativa, não deve ofuscar sua verdadeira vocação: a pregação do evangelho.</p>
+
+            <p class="text-lg text-justify" data-translate="Capistrano foi um defensor da emancipação de Palmeiras relacionado a Lençóis, refletindo sua preocupação com a autonomia e o desenvolvimento da região. No entanto, sua maior contribuição foi, sem dúvida, sua dedicação ao ministério. Ele se tornou um símbolo da luta missionária, enfrentando adversidades e perseguições com coragem e determinação.">Capistrano foi um defensor da emancipação de Palmeiras relacionado a Lençóis, refletindo sua preocupação com a autonomia e o desenvolvimento da região. No entanto, sua maior contribuição foi, sem dúvida, sua dedicação ao ministério. Ele se tornou um símbolo da luta missionária, enfrentando adversidades e perseguições com coragem e determinação.</p>
+
+            <h4 class="text-xl font-bold mt-4" data-translate="O Legado Espiritual">O Legado Espiritual</h4>
+            <p class="text-lg text-justify" data-translate="A vida de João Capistrano de Souza é um testemunho do poder transformador da fé. Sua dedicação à pregação e ao serviço comunitário deixou um legado duradouro na Igreja Presbiteriana em Palmeiras. Ele não apenas ajudou a estabelecer a presença presbiteriana na região, mas também inspirou gerações de líderes e fiéis a continuarem a missão de evangelização e serviço.">A vida de João Capistrano de Souza é um testemunho do poder transformador da fé. Sua dedicação à pregação e ao serviço comunitário deixou um legado duradouro na Igreja Presbiteriana em Palmeiras. Ele não apenas ajudou a estabelecer a presença presbiteriana na região, mas também inspirou gerações de líderes e fiéis a continuarem a missão de evangelização e serviço.</p>
+
+            <p class="text-lg text-justify" data-translate="Sua morte trágica, ocorrida enquanto se deslocava para uma reunião anual em Ponte Nova, foi profundamente lamentada pela missão. A perda de Capistrano não apenas deixou um vazio na liderança da igreja, mas também destacou o custo pessoal que muitos missionários enfrentaram em sua busca por transformar a realidade espiritual e social do sertão baiano.">Sua morte trágica, ocorrida enquanto se deslocava para uma reunião anual em Ponte Nova, foi profundamente lamentada pela missão. A perda de Capistrano não apenas deixou um vazio na liderança da igreja, mas também destacou o custo pessoal que muitos missionários enfrentaram em sua busca por transformar a realidade espiritual e social do sertão baiano.</p>
+
+            <h3 class="text-2xl font-bold mt-6" data-translate="Capítulo VI – A Evolução da Igreja em Palmeiras">Capítulo VI – A Evolução da Igreja em Palmeiras</h3>
+            <p class="text-lg text-justify" data-translate="A Igreja Presbiteriana em Palmeiras teve suas raízes no povoado de Rio Grande, uma localidade que fazia parte do contexto mais amplo do município. Com o crescimento da congregação, as atividades foram transferidas para a atual Rua da Ponte, no centro da cidade. Eventualmente, a igreja estabeleceu sua sede na Rua Coronel Antônio Afonso, 38, onde permanece até hoje, servindo como um farol de fé e comunidade para seus membros.">A Igreja Presbiteriana em Palmeiras teve suas raízes no povoado de Rio Grande, uma localidade que fazia parte do contexto mais amplo do município. Com o crescimento da congregação, as atividades foram transferidas para a atual Rua da Ponte, no centro da cidade. Eventualmente, a igreja estabeleceu sua sede na Rua Coronel Antônio Afonso, 38, onde permanece até hoje, servindo como um farol de fé e comunidade para seus membros.</p>
+
+            <h3 class="text-2xl font-bold mt-6" data-translate="Capítulo VII – O Legado e a Continuidade da Missão">Capítulo VII – O Legado e a Continuidade da Missão</h3>
+            <p class="text-lg text-justify" data-translate="A trajetória da Igreja Presbiteriana em Palmeiras é marcada por desafios, perseverança e um compromisso inabalável com a fé reformada. A dedicação de missionários como Chamberlain e Waddell, aliada à liderança espiritual de João Capistrano de Souza, foi fundamental para estabelecer e consolidar a presença presbiteriana na região. O legado desses pioneiros continua a inspirar gerações, refletindo a importância da fé, da comunidade e do serviço dedicado.">A trajetória da Igreja Presbiteriana em Palmeiras é marcada por desafios, perseverança e um compromisso inabalável com a fé reformada. A dedicação de missionários como Chamberlain e Waddell, aliada à liderança espiritual de João Capistrano de Souza, foi fundamental para estabelecer e consolidar a presença presbiteriana na região. O legado desses pioneiros continua a inspirar gerações, refletindo a importância da fé, da comunidade e do serviço dedicado.</p>
+
+            <h3 class="text-2xl font-bold mt-6" data-translate="Fontes">Fontes</h3>
+            <ul class="list-disc list-inside text-lg text-justify">
+                <li data-translate="Dissertação de Tiago Ferreira dos Santos, que analisa a ação missionária presbiteriana na Bahia.">Dissertação de Tiago Ferreira dos Santos, que analisa a ação missionária presbiteriana na Bahia.</li>
+                <li data-translate="Documentos institucionais da Missão Central do Brasil e do Presbitério Bahia-Sergipe.">Documentos institucionais da Missão Central do Brasil e do Presbitério Bahia-Sergipe.</li>
+                <li data-translate="Registros históricos disponíveis em repositórios digitais e bibliotecas online, como o da Universidade Federal da Bahia (UFBA) e o site oficial da Igreja Presbiteriana do Brasil.">Registros históricos disponíveis em repositórios digitais e bibliotecas online, como o da Universidade Federal da Bahia (UFBA) e o site oficial da Igreja Presbiteriana do Brasil.</li>
+                <li data-translate="&quot;Os pioneiros presbiterianos do Brasil: 1859-1900&quot; (2004) e &quot;Os consolidadores da obra presbiteriana no Brasil: 1901-1920&quot; (2014).">&quot;Os pioneiros presbiterianos do Brasil: 1859-1900&quot; (2004) e &quot;Os consolidadores da obra presbiteriana no Brasil: 1901-1920&quot; (2014).</li>
+            </ul>
+        </div>
+    </section>
+    <!-- Contato Section -->
+    <section id="conversa-pastor" class="py-12 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Contato">Contato</h2>
+            <div class="text-center">
+                <a href="https://wa.me/5575991437628" target="_blank"
+                    class="text-green-700 hover:text-green-500 flex items-center justify-center">
+                    <i class="fab fa-whatsapp fa-3x mr-2"></i> <span data-translate="Converse com o Pastor">Converse com o Pastor</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+                                        <!-- Equipe Section -->
+    <!-- Equipe Section -->
+    <section class="py-12">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Conheça a Organização da IPPalmeiras">Conheça a Organização da IPPalmeiras</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+                    <img loading="lazy" src="src/imgs/lids/Pastor.png"
+                        alt="Foto do Pastor" class="w-24 h-24 rounded-full mx-auto mb-4" width="90" height="90">
+                    <h3 class="text-xl font-bold mb-2" data-translate="Rev. Josué Nunes de Oliveira">Rev. Josué Nunes de Oliveira</h3>
+                    <p class="text-gray-700" data-translate="Pastor">Pastor</p>
+                    <p class="text-gray-700">(75) 99143-7628</p>
+                </div>
+                <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+                    <img loading="lazy" src="src/imgs/lids/MarcosCruz.png"
+                        alt="Foto do Presbítero 1" class="w-24 h-24 rounded-full mx-auto mb-4" width="90" height="90">
+                    <h3 class="text-xl font-bold mb-2" data-translate="Antonio Marcos Ramos Cruz">Antonio Marcos Ramos Cruz</h3>
+                    <p class="text-gray-700" data-translate="Presbítero">Presbítero</p>
+                    <p class="text-gray-700">(75) 99877-0823</p>
+                </div>
+                <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+                    <img loading="lazy" src="src/imgs/lids/Davi.png"
+                        alt="Foto do Presbítero 2" class="w-24 h-24 rounded-full mx-auto mb-4" width="90" height="90">
+                    <h3 class="text-xl font-bold mb-2" data-translate="David de Araújo Brandão">David de Araújo Brandão</h3>
+                    <p class="text-gray-700" data-translate="Presbítero">Presbítero</p>
+                    <p class="text-gray-700">(75) 99211-3268</p>
+                </div>
+
+                <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+                    <img loading="lazy" alt="Foto do Diácono 1" class="w-24 h-24 rounded-full mx-auto mb-4" height="100"
+                        src="src/imgs/lids/Bruno.png"
+                        width="100" />
+                    <h3 class="text-xl font-bold mb-2" data-translate="Bruno de Credico Taubert Libório">
+                        Bruno de Credico Taubert Libório
+                    </h3>
+                    <p class="text-gray-700" data-translate="Diácono">Diácono</p>
+                    <p class="text-gray-700">(75) 99987-4557</p>
+                </div>
+                <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+                    <img loading="lazy" alt="Foto do Diácono 2" class="w-24 h-24 rounded-full mx-auto mb-4" height="100"
+                        src="src/imgs/lids/Soares.png"
+                        width="100" />
+                    <h3 class="text-xl font-bold mb-2" data-translate="Elvis da Silva Soares">
+                        Elvis da Silva Soares
+                    </h3>
+                    <p class="text-gray-700" data-translate="Diácono">Diácono</p>
+                    <p class="text-gray-700">(75) 99131-0701</p>
+                </div>
+                <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+                    <img loading="lazy" alt="Foto do Diácono 3" class="w-24 h-24 rounded-full mx-auto mb-4" height="100"
+                        src="src/imgs/lids/MarcosSouza.png"
+                        width="100" />
+                    <h3 class="text-xl font-bold mb-2" data-translate="Marcos dos Santos Souza">
+                        Marcos dos Santos Souza
+                    </h3>
+                    <p class="text-gray-700" data-translate="Diácono">Diácono</p>
+                    <p class="text-gray-700">(75) 99132-9518</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Slideshow Section -->
+    <section class="py-12 mb-20 bg-gray-200">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8" data-translate="Galeria de Fotos">Galeria de Fotos</h2>
+            <div id="gallery-container" class="min-h-[500px] flex items-center justify-center">
+                <!-- As imagens da galeria serão carregadas aqui -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-green-700 text-white py-6">
+        <div class="container mx-auto px-6 text-center">
+            <p class="mb-2" data-translate="Visitantes:">Visitantes:</p> <span id="visitor-count" class="font-bold">0</span></p>
+            <p data-translate="© 2025 Igreja Presbiteriana em Palmeiras-BA. Todos os direitos reservados.<br>Administrador e Desenvolvido por Ian S. A. Santos">
+                © 2025 Igreja Presbiteriana em Palmeiras-BA. Todos os direitos reservados.<br>
+                Administrado e Desenvolvido por Ian S. A. Santos
+            </p>
+            <div class="mt-4">
+                <a class="text-white hover:text-gray-300 mx-2" href="#">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a class="text-white hover:text-gray-300 mx-2" href="#">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a class="text-white hover:text-gray-300 mx-2" href="#">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="src/js/script.js"></script>
+</body>
+
+</html>
