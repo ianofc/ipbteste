@@ -37,7 +37,7 @@ themeButton.addEventListener('click', () => {
 
 // Funções para o versículo diário
 function fetchVerse() {
-    fetch('/random_verse')
+fetch("https://ipbpalmeirasba.onrender.com/random_verse")
         .then(response => response.json())
         .then(data => {
             const verse = document.getElementById('verse');
@@ -118,7 +118,7 @@ function updatePlaylist() {
 // Função para inicializar o player
 async function initializePlayer() {
     try {
-        const response = await fetch('/api/music');
+        const response = await fetch("https://ipbpalmeirasba.onrender.com/api/music");
         tracks = await response.json();
 
         if (tracks.length > 0) {
@@ -158,7 +158,7 @@ function loadChristianMusic() {
 
 
 function updateVisitorCount() {
-    fetch('/visitor-count')
+    fetch("https://ipbpalmeirasba.onrender.com/visitor-count")
         .then(response => response.json())
         .then(data => {
             document.getElementById('visitor-count').textContent = data.count;
@@ -167,6 +167,9 @@ function updateVisitorCount() {
 
 // Translation functions
 const apiKey = "0f589a67-653f-48d4-8e10-ae561e883d26:fx";
+
+// Import Sarcinha from chatbot.js
+import { Sarcinha } from './chatbot.js';
 
 // Cache original texts
 const originalTexts = new Map();
@@ -197,12 +200,12 @@ async function translatePage(targetLang) {
                 if (!originalTexts.has(span)) {
                     originalTexts.set(span, span.textContent);
                 }
-                
+
                 // Obtém o texto a ser traduzido
                 const textToTranslate = targetLang === 'PT-BR' ? 
                     originalTexts.get(span) : 
                     span.textContent;
-                
+
                 translations.push({
                     span,
                     translation: translateText(textToTranslate, targetLang)
@@ -215,7 +218,7 @@ async function translatePage(targetLang) {
 
         // Aguarda todas as traduções serem concluídas
         const results = await Promise.all(translations.map(t => t.translation));
-        
+
         // Atualiza todos os elementos com suas traduções
         translations.forEach((item, index) => {
             item.span.textContent = results[index];
@@ -223,7 +226,7 @@ async function translatePage(targetLang) {
 
         // Esconde o indicador de carregamento
         document.body.style.cursor = 'default';
-        
+
         console.log(`Página traduzida para ${targetLang}`);
     } catch (error) {
         console.error('Falha na tradução:', error);
@@ -242,11 +245,11 @@ function translateToJapanese() { translatePage('JA'); }
 function handleScroll() {
     const scrollPosition = window.scrollY;
     const menuItems = document.querySelectorAll('#main-nav a');
-    
+
     menuItems.forEach(item => {
         const textSpan = item.querySelector('span');
         const icon = item.querySelector('img');
-        
+
         if (scrollPosition > 100) {
             textSpan.classList.add('hidden');
             icon.classList.remove('hidden');
@@ -262,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
     scheduleDailyVerse();
     initializePlayer();
     updateVisitorCount();
-    
+
     // Add scroll event listener
     window.addEventListener('scroll', handleScroll);
 
@@ -383,8 +386,7 @@ bookSelect.addEventListener('change', function() {
 
         const apiBook = bookMap[book] || book.toLowerCase().replace(/\s+/g, '');
         bibleContent.innerHTML = '<p class="text-center">Carregando...</p>';
-
-        fetch(`/api/verse/${book}/${chapter}`)
+ fetch(`https://ipbpalmeirasba.onrender.com/api/verse/${book}/${chapter}`)
             .then(response => response.json())
             .then(data => {
                 bibleContent.innerHTML = `
@@ -461,7 +463,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     const locationPhoto = document.getElementById('location-photo');
 
     // Busca dados da localização da API
-    const locationResponse = await fetch('/api/location');
+    const locationResponse = await fetch("https://ipbpalmeirasba.onrender.com/api/location");
     const locationData = await locationResponse.json();
     const { latitude, longitude } = locationData.coordinates;
 
@@ -484,7 +486,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     // Carrega o calendário
     async function loadCalendar() {
-        const response = await fetch('/api/calendar');
+        const response = await fetch('https://ipbpalmeirasba.onrender.com/api/calendar');
         const data = await response.json();
         const calendarFrame = document.getElementById('google-calendar');
         calendarFrame.src = data.calendar_url;
@@ -494,7 +496,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 });
 
 // Load documents
-fetch('/api/documents')
+fetch("https://ipbpalmeirasba.onrender.com/api/documents")
     .then(response => response.json())
     .then(documents => {
         const container = document.getElementById('documents-container');
@@ -515,7 +517,7 @@ let currentSlideIndex = 0;
 let galleryPhotos = [];
 
 function loadGallery() {
-    fetch('/api/photos')
+    fetch("https://ipbpalmeirasba.onrender.com/api/photos")
         .then(response => response.json())
         .then(photos => {
             galleryPhotos = photos;
